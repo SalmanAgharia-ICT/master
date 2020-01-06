@@ -1,0 +1,104 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/**
+ * Product view template
+ *
+ * @var $block \Magento\Catalog\Block\Product\View
+ */
+?>
+<?php $_helper = $this->helper('Magento\Catalog\Helper\Output'); ?>
+<?php $_product = $block->getProduct(); ?>
+
+<div class="product-add-form">
+    <form data-product-sku="<?= $block->escapeHtml($_product->getSku()) ?>"
+          action="<?= /* @NoEscape */ $block->getSubmitUrl($_product) ?>" method="post"
+          id="product_addtocart_form"<?php if ($_product->getOptions()): ?> enctype="multipart/form-data"<?php endif; ?>>
+        <input type="hidden" name="product" value="<?= /* @escapeNotVerified */ $_product->getId() ?>" />
+        <input type="hidden" name="selected_configurable_option" value="" />
+        <input type="hidden" name="related_product" id="related-products-field" value="" />
+        <input type="hidden" name="item"  value="<?= /* @noEscape */ $block->getRequest()->getParam('id') ?>" />
+        <div class="product-filters">
+            <div class="top-section">
+                <label for="top">Top:</label>
+                <label for="red" class="custom-radio">
+                    <input type="radio" name="top_color" id="red" value="red" style="background-color: red;">
+                    <span class="tooltip-content" id="tip-red" >
+                        <span class="bg" style="background-color: red;"></span>
+                        <span class="title">red</span>
+                    </span>
+                </label>
+                <label for="blue" class="custom-radio">
+                    <input type="radio" name="top_color" id="blue" value="blue" style="background-color: blue;">
+                    <span class="tooltip-content" id="tip-blue" >
+                        <span class="bg" style="background-color: blue;"></span>
+                        <span class="title">blue</span>
+                    </span>
+                </label>
+                <label for="green" class="custom-radio">
+                    <input type="radio" name="top_color" id="green" value="green" style="background-color: green;">
+                    <span class="tooltip-content" id="tip-green" >
+                        <span class="bg" style="background-color: green;"></span>
+                        <span class="title">green</span>
+                    </span>
+                </label>
+            </div>
+            <!-- <select id="top" name="top_color">
+                <option value="red">Red</option>
+                <option value="blue">Blue</option>
+                <option value="green">Green</option>
+            </select> -->
+            <div class="edge-section">
+                <label for="edge">Edge:</label>
+                <select id="edge" name="edge_color">
+                    <option value="black">Black</option>
+                    <option value="grey">Grey</option>
+                    <option value="white">White</option>
+                </select>
+            </div>
+            <div class="frame-section">
+                <label for="frame">Frame:</label>
+                <select id="frame" name="frame_color">
+                    <option value="blue">Blue</option>
+                    <option value="yellow">Yellow</option>
+                    <option value="silver">Silver</option>
+                </select>
+            </div>
+        </div>
+        <?= $block->getBlockHtml('formkey') ?>
+        <?= $block->getChildHtml('form_top') ?>
+        <?php if (!$block->hasOptions()):?>
+            <?= $block->getChildHtml('product_info_form_content') ?>
+        <?php else:?>
+            <?php if ($_product->isSaleable() && $block->getOptionsContainer() == 'container1'):?>
+                <?= $block->getChildChildHtml('options_container') ?>
+            <?php endif;?>
+        <?php endif; ?>
+
+        <?php if ($_product->isSaleable() && $block->hasOptions() && $block->getOptionsContainer() == 'container2'):?>
+            <?= $block->getChildChildHtml('options_container') ?>
+        <?php endif;?>
+        <?= $block->getChildHtml('form_bottom') ?>
+    </form>
+</div>
+<script>
+    require([
+        'jquery',
+        'priceBox'
+    ], function($){
+        var dataPriceBoxSelector = '[data-role=priceBox]',
+            dataProductIdSelector = '[data-product-id=<?= $block->escapeHtml($_product->getId()) ?>]',
+            priceBoxes = $(dataPriceBoxSelector + dataProductIdSelector);
+
+        priceBoxes = priceBoxes.filter(function(index, elem){
+            return !$(elem).find('.price-from').length;
+        });
+
+        priceBoxes.priceBox({'priceConfig': <?= /* @escapeNotVerified */ $block->getJsonConfig() ?>});
+    });
+</script>
